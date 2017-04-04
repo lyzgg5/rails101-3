@@ -1,5 +1,6 @@
 class GroupsController < ApplicationController
-  before_action :authenticate_user! , only: [:new]
+  before_action :authenticate_user! , only: [:new, :create, :edit, :update, :destroy]
+  before_action :find_group_and_check_permission, only: [:edit, :update, :destroy]
   def index
     @groups = Group.all
   end
@@ -9,7 +10,6 @@ class GroupsController < ApplicationController
   end
 
   def edit
-    @group = Group.find(params[:id])
   end
 
   def new
@@ -27,8 +27,6 @@ class GroupsController < ApplicationController
   end
 
   def update
-    @group = Group.find(params[:id])
-
     if @group.update(group_params)
       redirect_to groups_path, notice: "Update Succes更新成功"
     else
@@ -38,12 +36,17 @@ class GroupsController < ApplicationController
   end
 
   def destroy
-    @group = Group.find(params[:id])
     @group.destroy
     redirect_to groups_path, alert: "Group Deleted 刪除討論成功"
   end
 
 private
+  def find_group_and_check_permission
+    @group = Group.find(params[:id])
+    if current_user != @group.user
+      redirect_to root_path, alert: "你沒有權限，請先註冊或登錄"
+    end
+  end
 
   def group_params
     params.require(:group).permit(:title, :description)
