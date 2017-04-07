@@ -63,6 +63,7 @@ def quit
   end
 end
 
+
 private
   def find_group_and_check_permission
     @group = Group.find(params[:id])
@@ -70,9 +71,7 @@ private
       redirect_to root_path, alert: "你沒有權限，請先註冊或登錄"
     end
   end
-
   def group_params
     params.require(:group).permit(:title, :description)
   end
-
 end
